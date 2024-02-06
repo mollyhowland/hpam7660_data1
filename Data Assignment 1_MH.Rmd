@@ -1,0 +1,141 @@
+---
+title: "HPAM 7660 Data Assignment 1"
+author: "Molly Howland"
+date: "2024-02-05"
+output: pdf_document
+---
+```{r}
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+install.packages("dplyr")
+install.packages("readr")
+install.packages("tidyr")
+install.packages("nycflights13")
+install.packages("fivethirtyeight")
+
+library(dplyr)
+library(readr)
+library(tidyr)
+library(nycflights13)
+library(fivethirtyeight)
+```
+installed and uploaded packages
+
+```{r}
+glimpse(drinks)
+data(drinks)
+?drinks
+```
+
+Previewed drinks data frame
+
+```{r}
+country <- drinks$country
+beer_servings <- drinks$beer_servings
+spirit_servings <- drinks$spirit_servings
+wine_servings <- drinks$wine_servings
+total_litres_of_pure_alcohol <- drinks$total_litres_of_pure_alcohol
+```
+
+Defined drinks variables
+
+A "tidy" data set in R means that it is one where each variable has it's own column. Tidy data is in a narrow format, unlike messy data in a wide format. 
+
+```{r}
+drinks_smaller <- drinks %>% 
+  filter(country %in% c("USA", "China", "Italy", "Saudi Arabia")) %>% 
+  select(-total_litres_of_pure_alcohol) %>% 
+  rename(beer = beer_servings, spirit = spirit_servings, wine = wine_servings)
+drinks_smaller
+```
+
+Previewed drinks smaller data 
+
+The drinks smaller data is not in a tidy format, because each variable has it's own corresponding column.
+
+```{r}
+drinks_smaller_tidy <- drinks_smaller %>% 
+  pivot_longer(names_to = "type", 
+               values_to = "servings", 
+               cols = -country)
+drinks_smaller_tidy
+```
+
+Converting the drinks smaller data frame into a tidy format, I use the  pivot_longer function, and names_to to the alcohol type. I use values_to argument to include the serving sizes, and use cols to define what data I want/don't want as tidy. I input -country, indicating I don't want to dity the country variable. 
+
+```{r}
+drinks_smaller_tidy
+```
+
+Previewing drinks smaller new tidy format data frame
+
+```{r}
+airline_safety
+?airline_safety
+```
+
+Using help function for airline safety data frame. 
+
+```{r}
+airline_safety_smaller <- airline_safety %>% 
+  select(airline, starts_with("fatalities"))
+airline_safety_smaller
+```
+Making an airline safety smaller data set, with fatalities as a variable. 
+
+```{r}
+airline_safety_smaller_tidy <- airline_safety_smaller %>%
+  pivot_longer(names_to = "fatalities",
+               values_to = "count",
+               cols = c(fatalities_85_99, fatalities_00_14))
+airline_safety_smaller_tidy
+```
+
+Making the airline safety data set tidy, using values_to to measure fatality counts, and cols function to ensure that the fatalities for all of the years are tidied. 
+
+```{r}
+library(readr)
+dem_score <- read_csv("https://moderndive.com/data/dem_score.csv")
+dem_score
+```
+Loaded the external dem score data using the csv function. 
+
+```{r}
+glimpse(dem_score)
+```
+Previewed dem score data using glimpse function, and saw that it was not in a tidy format.
+
+```{r}
+dem_score_tidy <- dem_score %>%
+  pivot_longer(names_to = "year",
+               values_to = "democracy_score",
+               cols = -country,
+               names_transform = list(year = as.integer))
+dem_score_tidy
+```
+
+The dem score data was already small, so I just made it tidy using the same code format as for the other data. For the cols function I did -country because I wanted all of the countries represented in the data set. 
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
